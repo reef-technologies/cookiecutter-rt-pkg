@@ -114,7 +114,7 @@ def run_shellcheck(session, mode="check"):
 @nox.session(name="format", python=PYTHON_DEFAULT_VERSION)
 def format_(session):
     """Lint the code and apply fixes in-place whenever possible."""
-    install(session, "format")
+    install(session, "lint")
     session.run("ruff", "check", "--fix", ".")
     run_shellcheck(session, mode="fmt")
     run_readable(session, mode="fmt")
@@ -130,23 +130,11 @@ def lint(session):
     run_shellcheck(session, mode="check")
     run_readable(session, mode="check")
     session.run("ruff", "format", "--diff", ".")
-
-
-@nox.session(python=PYTHON_DEFAULT_VERSION)
-def type_check(session):
-    install(session, "type_check")
+    session.run("bandit", "--ini", "bandit.ini", "-r", ".", *session.posargs)
     session.run("mypy", "--config-file", "mypy.ini", ".", *session.posargs)
 
 
-@nox.session(python=PYTHON_DEFAULT_VERSION)
-def security_check(session):
-    install(session, "security_check")
-    session.run("bandit", "--ini", "bandit.ini", "-r", ".", *session.posargs)
-
-
 @nox.session(python=PYTHON_VERSIONS)
-# @nox.parametrize("django", DJANGO_VERSIONS)
-def test(session, django: str):
-    session.run_always("pdm", "install", "--dev")
-    # session.run_always("pip", "install", f"django~={django}.0")
+def test(session):
+    install(session, "test")
     session.run("pytest", "-vv", "-n",  "auto", *session.posargs)

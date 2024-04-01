@@ -18,15 +18,11 @@ test = [
 lint = [
     "ruff",
     "codespell[toml]",
-]
-type_check = [
+    "bandit>=1.7.7",
     "mypy",
     "types-freezegun",
     "types-python-dateutil",
     "types-requests",
-]
-security_check = [
-    "bandit>=1.7.7",
 ]
 
 [tool.ruff]
