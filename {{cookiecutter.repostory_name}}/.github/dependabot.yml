@@ -1,0 +1,10 @@
+version: 2
+updates:
+  - package-ecosystem: "pip"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 0
+  - package-ecosystem: "docker"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 0
