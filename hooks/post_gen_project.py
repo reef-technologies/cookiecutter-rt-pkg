@@ -66,7 +66,7 @@ def main():
             filepath.unlink()
 
     with working_directory(PROJECT_ROOT):
-        subprocess.check_call(["pdm", "lock", "--update-reuse"])
+        subprocess.check_call(["pdm", "lock", "--update-reuse", "--group", ":all"])
 
 
 if __name__ == "__main__":
