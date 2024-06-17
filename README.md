@@ -69,8 +69,8 @@ cruft link https://github.com/reef-technologies/cookiecutter-rt-pkg
 
 # Contributing
 
-When proposing new features or changes, please make sure there are also applicable to the application template [cookiecutter-rt-django](https://github.com/reef-technologies/cookiecutter-rt-django).
-This is to ensure we do not try to solve the same problem in two different ways.
+When proposing new features or changes, make sure to consider the context of the application template [cookiecutter-rt-django](https://github.com/reef-technologies/cookiecutter-rt-django) as well.
+It is important we do not try to solve the same problem in two different ways.
 
 ## License
 
