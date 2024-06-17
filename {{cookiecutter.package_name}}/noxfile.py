@@ -172,7 +172,7 @@ def make_release(session):
     parser = argparse.ArgumentParser()
 
     def version(value):
-        if not re.match(r"\d+\.\d+\.\d+", value):
+        if not re.match(r"\d+\.\d+\.\d+(?:(?:a|b|rc)\d+)?", value):
             raise argparse.ArgumentTypeError("Invalid version format")
         return value
 
