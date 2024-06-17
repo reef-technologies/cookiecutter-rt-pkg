@@ -1,5 +1,5 @@
 # {{cookiecutter.package_name}}
-
+&nbsp;[![Continuous Integration](workflows/Continuous%20Integration/badge.svg)](actions?query=workflow%3A%22Continuous+Integration%22)&nbsp;[![License](https://img.shields.io/pypi/l/{{cookiecutter.package_name}}.svg?label=License)](https://pypi.python.org/pypi/{{cookiecutter.package_name}})&nbsp;[![python versions](https://img.shields.io/pypi/pyversions/{{cookiecutter.package_name}}.svg?label=python%20versions)](https://pypi.python.org/pypi/{{cookiecutter.package_name}})&nbsp;[![PyPI version](https://img.shields.io/pypi/v/{{cookiecutter.package_name}}.svg?label=PyPI%20version)](https://pypi.python.org/pypi/{{cookiecutter.package_name}})
 
 ## Usage
 
