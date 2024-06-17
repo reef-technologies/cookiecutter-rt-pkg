@@ -64,7 +64,7 @@ Before committing make sure to review changes listed in [docs/3rd\_party/cookiec
 If you have an existing repo, you can link it to the template by running:
 
 ```sh
-cruft link https://github.com/reef-technologies/cookiecutter-rt-django
+cruft link https://github.com/reef-technologies/cookiecutter-rt-pkg
 ```
 
 # Contributing
@@ -78,4 +78,4 @@ This project is licensed under the terms of the [BSD-3 License](/LICENSE)
 
 ## Changelog
 
-Breaking changes are documented in the [CHANGELOG]({{cookiecutter.package_name}}/docs/3rd_party/cookiecutter-rt-django/CHANGELOG.md)
+Breaking changes are documented in the [CHANGELOG]({{cookiecutter.package_name}}/docs/3rd_party/cookiecutter-rt-pkg/CHANGELOG.md)
