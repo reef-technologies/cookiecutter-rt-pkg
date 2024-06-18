@@ -1,4 +1,2 @@
-def test_v0_exports():
-    import {{cookiecutter.package_name}}.v0 as api  # noqa
-
-    assert sorted(name for name in dir(api) if not name.startswith("_")) == []
+def test_apiver_exports(apiver_deps):
+    assert sorted(name for name in dir(apiver_deps) if not name.startswith("_")) == []
