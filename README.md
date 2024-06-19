@@ -11,6 +11,7 @@ Packages created from this template get following features:
 - Signed release files using sigstore
 - Pre-configured nox for testing (pytest), autoformatting and auto linting (ruff)
 - Testing against multiple Python versions, operating systems, and optionally, Django versions
+- Testing utils for testing ApiVer interfaces
 - Package layout and release process with SemVer & ApiVer in mind
 - Towncrier for conflict free changelogs
 
@@ -19,12 +20,6 @@ Packages created from this template get following features:
 - CI for cookiecutter template itself
 
 ## Planned features
-
-High priority:
-
-- [ ] testing utils for testing ApiVer modules
-
-Nice to haves:
 
 - [ ] CD should require CI tests to pass first
 - [ ] excluding some django-python combos in nox test matrix (allow to test of Django5+Python3.12 and Django4+Python3.9 but not Django5+Python3.9)
