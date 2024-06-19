@@ -38,6 +38,7 @@ DJANGO_SETTINGS_MODULE="tests.settings"
 test = [
     "freezegun",
     "pytest",
+    "pytest-apiver @ git+https://github.com/reef-technologies/pytest_apiver.git",
     "pytest-asyncio",
 # COOKIECUTTER{%- if cookiecutter.is_django_package == "y" %}
     "pytest-django",
