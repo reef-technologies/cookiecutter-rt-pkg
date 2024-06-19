@@ -34,6 +34,9 @@ target_package_name = "{{cookiecutter.package_name}}"  # required by pytest-apiv
 DJANGO_SETTINGS_MODULE="tests.settings"
 # COOKIECUTTER{%- endif %}
 
+[tool.pdm]
+distribution = true
+
 [tool.pdm.dev-dependencies]
 test = [
     "freezegun",
