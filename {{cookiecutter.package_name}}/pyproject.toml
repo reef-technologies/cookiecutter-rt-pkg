@@ -1,6 +1,5 @@
 [project]
 name = "{{cookiecutter.package_name.replace('_', '-')}}"
-version = "0.0.1"
 requires-python = ">=3.11"
 keywords = []
 license = {text = "MIT"}
@@ -21,6 +20,9 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
 ]
+dynamic = [
+    "version",
+]
 
 [project.urls]
 "Source" = "{{cookiecutter.repository_github_url}}"
@@ -30,16 +32,11 @@ classifiers = [
 requires = ["pdm-backend"]
 build-backend = "pdm.backend"
 
-[tool.pytest.ini_options]
-pythonpath = ["."]  # allow for `import tests` in test files
-target_package_name = "{{cookiecutter.package_name}}"  # required by pytest-apiver
-
-# COOKIECUTTER{%- if cookiecutter.is_django_package == "y" %}
-DJANGO_SETTINGS_MODULE="tests.settings"
-# COOKIECUTTER{%- endif %}
-
 [tool.pdm]
 distribution = true
+
+[tool.pdm.version]
+source = "scm"
 
 [tool.pdm.dev-dependencies]
 test = [
@@ -66,6 +63,14 @@ lint = [
 release = [
     "towncrier",
 ]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]  # allow for `import tests` in test files
+target_package_name = "{{cookiecutter.package_name}}"  # required by pytest-apiver
+
+# COOKIECUTTER{%- if cookiecutter.is_django_package == "y" %}
+DJANGO_SETTINGS_MODULE="tests.settings"
+# COOKIECUTTER{%- endif %}
 
 [tool.ruff]
 line-length = 120
