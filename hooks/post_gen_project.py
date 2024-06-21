@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import contextlib
-import importlib.util
 import os
 import pathlib
 import re
@@ -10,19 +9,15 @@ PROJECT_ROOT = pathlib.Path().resolve()
 NOXFILE_PATH = PROJECT_ROOT / "noxfile.py"
 
 
-def is_django_support_enabled():
-    """
-    Check if DJANGO SUPPORT is enabled.
-    """
-    # Since .cruft.json is not available at this point, we need to check from noxfile.py.
-    spec = importlib.util.spec_from_file_location("noxfile", NOXFILE_PATH)
-    noxfile = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(noxfile)
-
-    return hasattr(noxfile, "DJANGO_VERSIONS")
+def is_django_support_enabled() -> bool:
+    # COOKIECUTTER{%- if cookiecutter.is_django_package == "y" %}
+    return True
+    # COOKIECUTTER{%- else %}
+    return False  # noqa
+    # COOKIECUTTER{%- endif %}
 
 
-_DJANGO_ONL_FILE_MARKER = re.compile(
+_DJANGO_ON_FILE_MARKER = re.compile(
     r"^# cookiecutter-rt-pkg macro: requires cookiecutter.is_django_package$",
     re.MULTILINE,
 )
@@ -38,7 +33,7 @@ def get_django_specific_files():
                 content = f.read()
             except UnicodeDecodeError:
                 continue
-            without_marker_content = _DJANGO_ONL_FILE_MARKER.sub("", content)
+            without_marker_content = _DJANGO_ON_FILE_MARKER.sub("", content)
             if content != without_marker_content:
                 yield file_path, content
 

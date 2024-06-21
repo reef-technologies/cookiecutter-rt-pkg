@@ -47,6 +47,8 @@ def get_cruft_config(config_name="default", **kw):
     complete_config = {**cruft_config, **overrides, **kw}
     config_hash = hashlib.sha256(json.dumps(complete_config, sort_keys=True).encode()).hexdigest()
     complete_config["package_name"] = f"{config_name}_{config_hash[:8]}"
+    repo_name = complete_config['package_name'].replace("_", "-")
+    complete_config["repository_github_url"] = f"https://github.com/reef-technologies/{repo_name}"
     return complete_config
 
 

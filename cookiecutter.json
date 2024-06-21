@@ -1,6 +1,6 @@
 {
-  "package_name": "xxx",
-  "repository_github_url": "https://github.com/reef-technologies/xxx",
+  "package_name": "package_name",
+  "repository_github_url": "https://github.com/reef-technologies/package-name",
   "is_django_package": "n",
   "_jinja2_env_vars": {
     "block_start_string": "# COOKIECUTTER{%",

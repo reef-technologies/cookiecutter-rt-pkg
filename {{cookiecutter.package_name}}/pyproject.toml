@@ -1,5 +1,5 @@
 [project]
-name = "{{cookiecutter.package_name}}"
+name = "{{cookiecutter.package_name.replace('_', '-')}}"
 version = "0.0.1"
 requires-python = ">=3.11"
 keywords = []
