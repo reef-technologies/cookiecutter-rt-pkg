@@ -23,6 +23,8 @@ classifiers = [
 dynamic = [
     "version",
 ]
+dependencies = [
+]
 
 [project.urls]
 "Source" = "{{cookiecutter.repository_github_url}}"
