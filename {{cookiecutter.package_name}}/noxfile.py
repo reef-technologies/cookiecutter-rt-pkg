@@ -170,6 +170,7 @@ def test(session):
 
 @nox.session(python=PYTHON_DEFAULT_VERSION)
 def make_release(session):
+    install(session, "release", no_self=True, no_default=True)
     parser = argparse.ArgumentParser()
 
     def version(value):
