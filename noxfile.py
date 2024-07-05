@@ -189,7 +189,6 @@ def crufted_project(session, cruft_config):
     project_path = tmpdir_path / cruft_config["package_name"]
     if not project_path.exists():
         session.log("Creating project in %s", tmpdir.name)
-        # project_path.mkdir(parents=True)
         with with_dirty_commit(session):
             session.run(
                 "cruft",
@@ -226,6 +225,15 @@ def rm_root_owned(session, dirpath):
         *[f"/tmpdir/{f.name}" for f in children],
         external=True,
     )
+
+
+@contextlib.contextmanager
+def docker_up(session):
+    session.run("docker", "compose", "up", "-d")
+    try:
+        yield
+    finally:
+        session.run("docker", "compose", "down", "-v", "--remove-orphans")
 
 
 @nox.session(python=PYTHON_DEFAULT_VERSION, tags=["crufted_project"])
