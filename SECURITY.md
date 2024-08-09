@@ -19,7 +19,7 @@ Please do not publicly disclose the details of the vulnerability until we have h
 
 1. **Submit vulnerability report**:
 
-   Please use [Report a vulnerability]((https://docs.github.com/en/code-security/security-advisories/guidance-on-reporting-and-writing-information-about-vulnerabilities/privately-reporting-a-security-vulnerability#privately-reporting-a-security-vulnerability) functionality of this GitHub report.
+   Please use [Report a vulnerability](https://docs.github.com/en/code-security/security-advisories/guidance-on-reporting-and-writing-information-about-vulnerabilities/privately-reporting-a-security-vulnerability#privately-reporting-a-security-vulnerability) functionality of this GitHub repository.
 
    Please use the following template:
 
