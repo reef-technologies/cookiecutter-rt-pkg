@@ -17,8 +17,9 @@ Please do not publicly disclose the details of the vulnerability until we have h
 
 ### How to Report
 
-1. **Email**:
-   Send an email with vulnerability description to <opensource@reef.pl> .
+1. **Submit vulnerability report**:
+
+   Please use [Report a vulnerability]((https://docs.github.com/en/code-security/security-advisories/guidance-on-reporting-and-writing-information-about-vulnerabilities/privately-reporting-a-security-vulnerability#privately-reporting-a-security-vulnerability) functionality of this GitHub report.
 
    Please use the following template:
 
@@ -34,14 +35,14 @@ Please do not publicly disclose the details of the vulnerability until we have h
    >
    > e.g., name, email, or GitHub handle
 
-2. **Response Time**:
-   We will acknowledge your report within 30 days and provide a timeline for fixing the vulnerability.
+3. **Response Time**:
+   We will acknowledge your report within 10 days and provide a timeline for fixing the vulnerability.
 
-3. **Updates**:
+4. **Updates**:
    We will keep you updated as we work on a fix.
    You may be asked to provide additional information or clarification.
 
-4. **Disclosure**:
+5. **Disclosure**:
    We follow a coordinated disclosure process.
    Once a fix is implemented, we will release it and publicly disclose the details of the vulnerability along with credits to the reporter.
 
