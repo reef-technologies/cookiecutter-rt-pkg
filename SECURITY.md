@@ -35,14 +35,14 @@ Please do not publicly disclose the details of the vulnerability until we have h
    >
    > e.g., name, email, or GitHub handle
 
-3. **Response Time**:
+2. **Response Time**:
    We will acknowledge your report within 10 days and provide a timeline for fixing the vulnerability.
 
-4. **Updates**:
+3. **Updates**:
    We will keep you updated as we work on a fix.
    You may be asked to provide additional information or clarification.
 
-5. **Disclosure**:
+4. **Disclosure**:
    We follow a coordinated disclosure process.
    Once a fix is implemented, we will release it and publicly disclose the details of the vulnerability along with credits to the reporter.
 
