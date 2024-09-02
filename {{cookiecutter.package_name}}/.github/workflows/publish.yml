@@ -16,13 +16,14 @@ env:
 
 jobs:
 # COOKIECUTTER{%- raw %}
-  publish:
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    permissions:
-      id-token: write  # allows publishing to PyPI
-      contents: write  # allows uploading a GitHub release
+  # Job to get version from tag
+  get-version:
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.get-version.outputs.version }}
+      draft: ${{ steps.get-version.outputs.draft }}
+      prerelease: ${{ steps.get-version.outputs.prerelease }}
+      is_latest_version: ${{ steps.highest-version.outputs.is_latest_version }}
     steps:
       - name: Get version from tag
         id: get-version
@@ -41,6 +42,32 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Get the highest version in the repository
+        id: highest-version
+        run: |
+          git fetch --tags
+          highest_version=$(git tag --sort=-v:refname | grep -E '^v[0-9]+' | head -n 1)
+          echo "highest_version=${highest_version#v}" >> "$GITHUB_OUTPUT"
+          if [[ ${{ steps.get-version.outputs.version }} == "${highest_version#v}" ]] && [ "${{ steps.get-version.outputs.draft }}" == "false" ]; then
+              echo "is_latest_version=true" >> "$GITHUB_OUTPUT"
+          else
+              echo "is_latest_version=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  # Job for Python package publishing
+  publish-python:
+    needs: get-version
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    permissions:
+      id-token: write  # allows publishing to PyPI
+      contents: write  # allows uploading a GitHub release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Set up Python ${{ env.PYTHON_DEFAULT_VERSION }}
         uses: actions/setup-python@v5
         with:
@@ -53,9 +80,9 @@ jobs:
         id: read-changelog
         uses: mindsers/changelog-reader-action@v2
         with:
-          version: ${{ steps.get-version.outputs.version }}
+          version: ${{ needs.get-version.outputs.version }}
           path: ./CHANGELOG.md
-        continue-on-error: ${{ fromJSON(steps.get-version.outputs.draft) }}
+        continue-on-error: ${{ fromJSON(needs.get-version.outputs.draft) }}
 
       - name: Build
         run: pdm build
@@ -71,10 +98,10 @@ jobs:
         id: create-release
         uses: softprops/action-gh-release@v2
         with:
-          name: ${{ steps.get-version.outputs.version }}
+          name: ${{ needs.get-version.outputs.version }}
           body: ${{ steps.read-changelog.outputs.changes }}
-          draft: ${{ fromJSON(steps.get-version.outputs.draft)}}
-          prerelease: ${{ fromJSON(steps.get-version.outputs.prerelease) }}
+          draft: ${{ fromJSON(needs.get-version.outputs.draft) }}
+          prerelease: ${{ fromJSON(needs.get-version.outputs.prerelease) }}
           files: >-
             dist/*.tar.gz
             dist/*.whl
@@ -84,12 +111,66 @@ jobs:
         run: rm -f dist/*.sigstore
 
       - name: Publish distribution 📦 to TestPyPI
-        if: ${{ steps.get-version.outputs.draft == 'true' }}
+        if: ${{ needs.get-version.outputs.draft == 'true' }}
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           repository-url: https://test.pypi.org/legacy/
 
       - name: Publish distribution 📦 to PyPI
-        if: ${{ steps.get-version.outputs.draft == 'false' }}
+        if: ${{ needs.get-version.outputs.draft == 'false' }}
         uses: pypa/gh-action-pypi-publish@release/v1
 # COOKIECUTTER{%- endraw %}
+
+# COOKIECUTTER{% if cookiecutter.docker_image == "y" %}
+# COOKIECUTTER{%- raw %}
+  publish-docker:
+    needs:
+      - get-version
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    permissions:
+      packages: write  # allows publishing to GitHub Container Registry
+      contents: read   # required for the Docker build context
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine Docker image tags
+        id: docker-tags
+        run: |
+          if [ "${{ needs.get-version.outputs.draft }}" = "true" ]; then
+            DOCKER_TAGS="ghcr.io/${{ github.repository }}:draft-${{ needs.get-version.outputs.version }}"
+          else
+            DOCKER_TAGS="ghcr.io/${{ github.repository }}:${{ needs.get-version.outputs.version }}"
+            if [ "${{ needs.get-version.outputs.is_latest_version }}" = "true" ]; then
+              DOCKER_TAGS="$DOCKER_TAGS,ghcr.io/${{ github.repository }}:latest"
+            fi
+          fi
+          echo "tags<<EOF" >> $GITHUB_OUTPUT
+          echo "$DOCKER_TAGS" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        env:
+          IMAGE_NAME: ${{ github.repository }}  # Defaults to the repo name for the Docker image
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.docker-tags.outputs.tags }}
+# COOKIECUTTER{%- endraw %}
+# COOKIECUTTER{%- endif %}
