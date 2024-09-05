@@ -121,7 +121,7 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
 # COOKIECUTTER{%- endraw %}
 
-# COOKIECUTTER{% if cookiecutter.docker_image == "y" %}
+# COOKIECUTTER{% if cookiecutter.build_docker_image == "y" %}
 # COOKIECUTTER{%- raw %}
   publish-docker:
     needs:
