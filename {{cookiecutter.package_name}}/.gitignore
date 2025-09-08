@@ -9,7 +9,7 @@ venv
 media/
 .backups/
 .envrc
-.pdm-python
+.python-version
 .terraform.lock.hcl
 .terraform/
 .nox/

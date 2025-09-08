@@ -22,7 +22,7 @@ Internal packages, i.e. prefixed by `{{cookiecutter.package_name}}._` do not sha
 
 
 Pre-requisites:
-- [pdm](https://pdm.fming.dev/)
+- [uv](https://docs.astral.sh/uv/)
 - [nox](https://nox.thea.codes/en/stable/)
 - [docker](https://www.docker.com/) and [docker compose plugin](https://docs.docker.com/compose/)
 
@@ -35,7 +35,7 @@ nox -t check # equivalent to `nox -t format lint test`
 
 If you wish to install dependencies into `.venv` so your IDE can pick them up, you can do so using:
 ```
-pdm install --dev
+uv sync --all-extras --dev
 ```
 
 ### Release process

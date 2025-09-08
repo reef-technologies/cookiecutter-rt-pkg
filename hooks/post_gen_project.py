@@ -61,7 +61,21 @@ def main():
             filepath.unlink()
 
     with working_directory(PROJECT_ROOT):
-        subprocess.check_call(["pdm", "lock", "--update-reuse", "--group", ":all"])
+        # Initialize git repository if not already present (required for hatch-vcs)
+        if not (PROJECT_ROOT / ".git").exists():
+            try:
+                subprocess.check_call(["git", "init"])
+                subprocess.check_call(["git", "add", "."])
+                subprocess.check_call(["git", "commit", "-m", "Initial commit"])
+            except subprocess.CalledProcessError as e:
+                print(f"Warning: Failed to initialize git repository: {e}")
+
+        try:
+            subprocess.check_call(["uv", "sync"])
+            subprocess.check_call(["uv", "lock", "--upgrade"])
+        except subprocess.CalledProcessError as e:
+            print(f"Warning: Failed to lock dependencies: {e}")
+            print("You may need to run 'uv lock --upgrade' manually after setting up the git repository.")
 
 
 if __name__ == "__main__":
