@@ -1,4 +1,4 @@
-.git
+# .git -- git is required for hatch-vcs
 *.pyc
 *.sqlite3
 *~
