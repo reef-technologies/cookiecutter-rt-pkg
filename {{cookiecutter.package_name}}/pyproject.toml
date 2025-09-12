@@ -35,8 +35,10 @@ build-backend = "hatchling.build"
 
 [tool.hatch.version]
 source = "vcs"
+
 # COOKIECUTTER{% if cookiecutter.build_docker_image == "y" %}
-root = "/app"
+[tool.setuptools_scm]
+search_parent_directories = true
 # COOKIECUTTER{% endif %}
 
 [tool.hatch.build.hooks.vcs]
