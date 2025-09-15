@@ -35,11 +35,10 @@ build-backend = "hatchling.build"
 
 [tool.hatch.version]
 source = "vcs"
+fallback-version = "0.0.0"
 
-# COOKIECUTTER{% if cookiecutter.build_docker_image == "y" %}
 [tool.setuptools_scm]
 search_parent_directories = true
-# COOKIECUTTER{% endif %}
 
 [tool.hatch.build.hooks.vcs]
 version-file = "src/{{cookiecutter.package_name}}/_version.py"
