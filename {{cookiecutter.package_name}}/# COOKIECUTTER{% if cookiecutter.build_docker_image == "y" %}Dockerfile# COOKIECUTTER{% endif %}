@@ -8,23 +8,25 @@ RUN apk add --no-cache \
     gcc \
     musl-dev \
     libffi-dev \
-    openssl-dev
+    openssl-dev \
+    git
 
-ENV PDM_VERSION=2.18.1
-RUN curl -sSL https://raw.githubusercontent.com/pdm-project/pdm/main/install-pdm.py | python3 -
+RUN pip install --no-cache-dir uv
 
 ENV PATH="/root/.local/bin:$PATH"
 
 COPY . .
 
-ENV PDM_CHECK_UPDATE=false
-RUN pdm export > /tmp/requirements.txt
+RUN uv export --format requirements-txt > /tmp/requirements.txt
 
-ARG PDM_BUILD_SCM_VERSION="0.0.1"
-RUN pdm build -d /tmp/wheelhouse
+RUN uv build --wheel --out-dir /tmp/wheelhouse
 
 RUN pip install --no-cache-dir -r /tmp/requirements.txt
-RUN pip install --no-cache-dir /tmp/wheelhouse/*.whl
+RUN pip install --no-cache-dir --no-deps /tmp/wheelhouse/*.whl
+
+# Remove the local package reference (lines starting with .) from requirements.txt
+# Install only the external dependencies from the cleaned requirements.txt
+RUN sed '/^\./d' /tmp/requirements.txt > /tmp/requirements-clean.txt && pip install --no-cache-dir -r /tmp/requirements-clean.txt
 
 FROM python:${PYTHON_VERSION}-alpine
 

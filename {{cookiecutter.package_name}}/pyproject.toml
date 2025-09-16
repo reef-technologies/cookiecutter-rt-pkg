@@ -30,16 +30,18 @@ dependencies = [
 "Issue Tracker" = "{{cookiecutter.repository_github_url}}/issues"
 
 [build-system]
-requires = ["pdm-backend"]
-build-backend = "pdm.backend"
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
 
-[tool.pdm]
-distribution = true
+[tool.hatch.version]
+source = "vcs"
+fallback-version = "0.0.0"
 
-[tool.pdm.version]
-source = "scm"
 
-[tool.pdm.dev-dependencies]
+[tool.hatch.build.hooks.vcs]
+version-file = "src/{{cookiecutter.package_name}}/_version.py"
+
+[dependency-groups]
 test = [
     "freezegun",
     "pytest",
@@ -92,8 +94,9 @@ ignore = [
 "test/**" = ["D", "F403", "F405"]
 
 [tool.codespell]
-skip = "*.min.js,pdm.lock"
+skip = "*.min.js,uv.lock"
 ignore-words-list = "datas"
+
 
 [tool.towncrier]
 directory = "changelog.d"

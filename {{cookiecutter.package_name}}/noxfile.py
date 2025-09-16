@@ -11,7 +11,6 @@ from pathlib import Path
 
 import nox
 
-os.environ["PDM_IGNORE_SAVED_PYTHON"] = "1"
 
 CI = os.environ.get("CI") is not None
 
@@ -47,7 +46,7 @@ def install(session: nox.Session, *groups, dev: bool = True, editable: bool = Fa
         other_args.append("--no-default")
     for group in groups:
         other_args.extend(["--group", group])
-    session.run("pdm", "install", "--check", *other_args, external=True)
+    session.run("uv", "sync", *other_args, external=True)
 
 
 @functools.lru_cache
