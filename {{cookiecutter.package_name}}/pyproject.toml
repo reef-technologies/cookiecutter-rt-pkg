@@ -37,8 +37,6 @@ build-backend = "hatchling.build"
 source = "vcs"
 fallback-version = "0.0.0"
 
-[tool.setuptools_scm]
-search_parent_directories = true
 
 [tool.hatch.build.hooks.vcs]
 version-file = "src/{{cookiecutter.package_name}}/_version.py"
