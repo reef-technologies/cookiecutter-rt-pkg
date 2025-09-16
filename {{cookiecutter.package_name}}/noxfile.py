@@ -11,7 +11,6 @@ from pathlib import Path
 
 import nox
 
-
 CI = os.environ.get("CI") is not None
 
 ROOT = Path(".")
@@ -46,7 +45,7 @@ def install(session: nox.Session, *groups, dev: bool = True, editable: bool = Fa
         other_args.append("--no-default")
     for group in groups:
         other_args.extend(["--group", group])
-    session.run("uv", "sync", *other_args, external=True)
+    session.run("uv", "sync", "--active", *other_args, external=True)
 
 
 @functools.lru_cache
