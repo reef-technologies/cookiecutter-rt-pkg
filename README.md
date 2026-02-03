@@ -32,7 +32,7 @@ Packages created from this template get following features:
 [cruft](https://github.com/cruft/cruft) is used to manage the template, you can install it with:
 
 ```sh
-pip install cruft
+uv tool install cruft
 ```
 
 ### To generate a new package:
