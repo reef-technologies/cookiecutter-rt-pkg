@@ -1,0 +1,164 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - release/production
+
+env:
+  PYTHON_DEFAULT_VERSION: "3.12"
+
+# COOKIECUTTER{%- raw %}
+permissions:
+  contents: write
+  id-token: write
+  packages: write
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    outputs:
+      bumped: ${{ steps.compare.outputs.bumped }}
+      new_tag: ${{ steps.post.outputs.tag }}
+      old_tag: ${{ steps.pre.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.8.x"
+          enable-cache: true
+          python-version: ${{ env.PYTHON_DEFAULT_VERSION }}
+
+      - name: Get pre-bump version tag
+        id: pre
+        run: echo "tag=$(git describe --tags --abbrev=0 2>/dev/null || echo '')" >> "$GITHUB_OUTPUT"
+
+      - name: Bump version
+        continue-on-error: true
+        run: uvx commitizen bump --yes
+
+      - name: Get post-bump version tag
+        id: post
+        run: echo "tag=$(git describe --tags --abbrev=0 2>/dev/null || echo '')" >> "$GITHUB_OUTPUT"
+
+      - name: Compare tags
+        id: compare
+        run: |
+          if [ "${{ steps.pre.outputs.tag }}" != "${{ steps.post.outputs.tag }}" ] && [ -n "${{ steps.post.outputs.tag }}" ]; then
+            echo "bumped=true" >> "$GITHUB_OUTPUT"
+            echo "New tag: ${{ steps.post.outputs.tag }} (was: ${{ steps.pre.outputs.tag }})"
+          else
+            echo "bumped=false" >> "$GITHUB_OUTPUT"
+            echo "No version bump detected"
+          fi
+
+      - name: Push tag
+        if: steps.compare.outputs.bumped == 'true'
+        run: git push origin "${{ steps.post.outputs.tag }}"
+
+  changelog:
+    needs: bump
+    if: needs.bump.outputs.bumped == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate changelog
+        uses: ./.github/actions/generate-changelog
+        with:
+          current-tag: ${{ needs.bump.outputs.new_tag }}
+          previous-tag: ${{ needs.bump.outputs.old_tag }}
+          output-file: changelog.json
+          triggered-by: ${{ github.triggering_actor }}
+
+      - name: Upload changelog
+        uses: actions/upload-artifact@v4
+        with:
+          name: changelog
+          path: changelog.json
+
+  publish-python:
+    needs: [bump, changelog]
+    if: needs.bump.outputs.bumped == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.8.x"
+          enable-cache: true
+          python-version: ${{ env.PYTHON_DEFAULT_VERSION }}
+
+      - name: Build
+        run: uv build
+
+      - name: Download changelog
+        uses: actions/download-artifact@v4
+        with:
+          name: changelog
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+
+      - name: Publish GitHub release
+        uses: ./.github/actions/publish-github-release
+        with:
+          tag: ${{ needs.bump.outputs.new_tag }}
+          changelog-file: changelog.json
+# COOKIECUTTER{%- endraw %}
+
+# COOKIECUTTER{%- raw %}
+  notify:
+    needs: [bump, changelog]
+    if: needs.bump.outputs.bumped == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download changelog
+        uses: actions/download-artifact@v4
+        with:
+          name: changelog
+
+      - name: Publish changelog to Slack
+        uses: ./.github/actions/publish-changelog-to-slack
+        with:
+          changelog-file: changelog.json
+          message-title: "${{ github.event.repository.name }} ${{ needs.bump.outputs.new_tag }} released"
+          webhook-url: ${{ secrets.SLACK_RELEASE_WEBHOOK_URL }}
+# COOKIECUTTER{%- endraw %}
+
+# COOKIECUTTER{% if cookiecutter.build_docker_image == "y" %}
+# COOKIECUTTER{%- raw %}
+  publish-docker:
+    needs: bump
+    if: needs.bump.outputs.bumped == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Publish Docker image
+        uses: ./.github/actions/publish-docker
+        with:
+          tag: ${{ needs.bump.outputs.new_tag }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+# COOKIECUTTER{%- endraw %}
+# COOKIECUTTER{%- endif %}

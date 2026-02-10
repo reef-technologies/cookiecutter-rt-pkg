@@ -1,0 +1,47 @@
+name: Publish Docker Image
+description: Build and push Docker image to GitHub Container Registry
+
+inputs:
+  tag:
+    description: "Release tag (e.g. v1.2.3)"
+    required: true
+  github-token:
+    description: "GitHub token for GHCR authentication"
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Determine Docker image tags
+      id: docker-tags
+      shell: bash
+      run: |
+        VERSION="${{ inputs.tag }}"
+        VERSION="${VERSION#v}"
+        HIGHEST=$(git tag --sort=-v:refname | grep -E '^v[0-9]+' | head -n 1)
+        DOCKER_TAGS="ghcr.io/${{ github.repository }}:${VERSION}"
+        if [ "${{ inputs.tag }}" = "$HIGHEST" ]; then
+          DOCKER_TAGS="$DOCKER_TAGS,ghcr.io/${{ github.repository }}:latest"
+        fi
+        echo "tags<<EOF" >> $GITHUB_OUTPUT
+        echo "$DOCKER_TAGS" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Log in to GitHub Container Registry
+      uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ inputs.github-token }}
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v6
+      with:
+        context: .
+        file: ./Dockerfile
+        platforms: linux/amd64,linux/arm64
+        push: true
+        tags: ${{ steps.docker-tags.outputs.tags }}

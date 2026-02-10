@@ -1,0 +1,66 @@
+name: Publish GitHub Release
+description: Sign artifacts with sigstore, create GitHub release with changelog
+
+inputs:
+  tag:
+    description: "Release tag (e.g. v1.2.3)"
+    required: true
+  changelog-file:
+    description: "Path to changelog JSON file"
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Sign distribution
+      uses: sigstore/gh-action-sigstore-python@v3.1.0
+      with:
+        inputs: >-
+          dist/*.tar.gz
+          dist/*.whl
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v6
+      with:
+        version: "0.8.x"
+        enable-cache: true
+
+    - name: Convert changelog to markdown
+      id: changelog-md
+      shell: bash
+      run: |
+        BODY=$(uv run ${{ github.action_path }}/changelog_to_markdown.py \
+          --changelog-file "${{ inputs.changelog-file }}")
+        {
+          echo "body<<CHANGELOG_EOF"
+          echo "$BODY"
+          echo "CHANGELOG_EOF"
+        } >> "$GITHUB_OUTPUT"
+
+    - name: Determine if latest version
+      id: latest
+      shell: bash
+      run: |
+        HIGHEST=$(git tag --sort=-v:refname | grep -E '^v[0-9]+' | head -n 1)
+        if [ "${{ inputs.tag }}" = "$HIGHEST" ]; then
+          echo "is_latest=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "is_latest=false" >> "$GITHUB_OUTPUT"
+        fi
+
+    - name: Create GitHub release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ inputs.tag }}
+        name: ${{ inputs.tag }}
+        body: ${{ steps.changelog-md.outputs.body }}
+        make_latest: ${{ steps.latest.outputs.is_latest }}
+        files: >-
+          dist/*.tar.gz
+          dist/*.whl
+          dist/*.sigstore
+
+    - name: Clean up signature files
+      if: always()
+      shell: bash
+      run: rm -f dist/*.sigstore dist/*.sigstore.json

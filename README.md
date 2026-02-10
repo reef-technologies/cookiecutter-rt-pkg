@@ -13,7 +13,6 @@ Packages created from this template get following features:
 - Testing against multiple Python versions, operating systems, and optionally, Django versions
 - Testing utils for testing ApiVer interfaces
 - Package layout and release process with SemVer & ApiVer in mind
-- Towncrier for conflict free changelogs
 
 ## Template features
 

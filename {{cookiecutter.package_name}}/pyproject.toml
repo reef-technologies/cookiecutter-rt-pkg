@@ -63,10 +63,6 @@ lint = [
     "types-python-dateutil",
     "types-requests",
 ]
-release = [
-    "towncrier",
-]
-
 [tool.pytest.ini_options]
 pythonpath = ["."]  # allow for `import tests` in test files
 target_package_name = "{{cookiecutter.package_name}}"  # required by pytest-apiver
@@ -97,50 +93,6 @@ ignore = [
 skip = "*.min.js,uv.lock"
 ignore-words-list = "datas"
 
-
-[tool.towncrier]
-directory = "changelog.d"
-filename = "CHANGELOG.md"
-start_string = "<!-- towncrier release notes start -->\n"
-underlines = ["", "", ""]
-title_format = "## [{version}]({{cookiecutter.repository_github_url}}/releases/tag/v{version}) - {project_date}"
-issue_format = "[#{issue}]({{cookiecutter.repository_github_url}}/issues/{issue})"
-
-[[tool.towncrier.type]]
-directory = "removed"
-name = "Removed"
-showcontent = true
-
-[[tool.towncrier.type]]
-directory = "changed"
-name = "Changed"
-showcontent = true
-
-[[tool.towncrier.type]]
-directory = "fixed"
-name = "Fixed"
-showcontent = true
-
-[[tool.towncrier.type]]
-directory = "deprecated"
-name = "Deprecated"
-showcontent = true
-
-[[tool.towncrier.type]]
-directory = "added"
-name = "Added"
-showcontent = true
-
-[[tool.towncrier.type]]
-directory = "doc"
-name = "Doc"
-showcontent = true
-
-[[tool.towncrier.type]]
-directory = "infrastructure"
-name = "Infrastructure"
-showcontent = true
-
 [tool.mypy]
 
 [[tool.mypy.overrides]]
@@ -150,3 +102,9 @@ module = [
     "tests.*",
 ]
 ignore_missing_imports = true
+
+[tool.commitizen]
+version_provider = "scm"
+tag_format = "v$version"
+update_changelog_on_bump = false
+major_version_zero = true
