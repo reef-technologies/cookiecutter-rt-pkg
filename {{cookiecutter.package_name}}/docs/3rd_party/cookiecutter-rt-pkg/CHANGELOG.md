@@ -13,3 +13,4 @@ Currently, `cookiecutter-rt-pkg` has no explicit versioning amd we purely rely o
 ## [Unreleased]
 
 * **BREAKING** Introduced cookiecutter-rt-pkg template
+* **BREAKING** Switched cookiecutter vars from `y`/`n` to `true`/`false` (caution: values that were `n` will be treated as `true` after update)

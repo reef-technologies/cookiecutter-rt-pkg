@@ -1,0 +1,34 @@
+ARG IMAGE=python:3.14.4-slim-trixie
+
+FROM ${IMAGE} AS builder
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    curl \
+    libffi-dev \
+    libssl-dev \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# 0.11.6-python3.14-trixie
+COPY --from=ghcr.io/astral-sh/uv@sha256:f3b1d933a49112e15fb02a24f9bfc8fef9986351afc601fcaba4c01a9b6a0eac /usr/local/bin/uv /usr/local/bin/uvx /bin/
+COPY . .
+
+RUN mkdir -p /build && uv export --all-extras --no-emit-project --format requirements.txt > /build/requirements.txt
+RUN uv build --wheel --out-dir /build
+
+# ------------------------------
+
+FROM ${IMAGE}
+ENV PATH="/usr/local/bin:$PATH"
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libffi8 \
+    libssl3 \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=builder /build /build
+RUN pip install --no-cache-dir -r /build/requirements.txt \
+    && pip install --no-cache-dir /build/*.whl \
+    && rm -rf /build
+ENTRYPOINT ["{{ cookiecutter.package_name | replace('_', '-') }}"]

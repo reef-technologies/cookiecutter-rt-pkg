@@ -1,6 +1,6 @@
 [project]
 name = "{{cookiecutter.package_name.replace('_', '-')}}"
-requires-python = ">=3.11"
+requires-python = ">={{ cookiecutter.python_versions.split(',') | map('trim') | sort_versions | first }}"
 keywords = []
 license = {text = "MIT"}
 readme = "README.md"
@@ -8,16 +8,19 @@ authors = [
     {name = "Reef Technologies", email = "opensource@reef.pl"},
 ]
 classifiers = [
-# COOKIECUTTER{%- if cookiecutter.is_django_package == "y" %}
+    {% if cookiecutter.django_versions %}
     "Framework :: Django",
-    "Framework :: Django :: 4.2",
-# COOKIECUTTER{%- endif %}
+    {% for version in cookiecutter.django_versions.split(',') | map('trim') %}
+    "Framework :: Django :: {{ version }}",
+    {% endfor %}
+    {% endif %}
     "Intended Audience :: Developers",
     "Topic :: Software Development :: Libraries",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
+    {% for version in cookiecutter.python_versions.split(',') | map('trim') %}
+    "Programming Language :: Python :: {{ version }}",
+    {% endfor %}
 ]
 dynamic = [
     "version",
@@ -28,52 +31,56 @@ dependencies = [
 [project.urls]
 "Source" = "{{cookiecutter.repository_github_url}}"
 "Issue Tracker" = "{{cookiecutter.repository_github_url}}/issues"
+"Changelog" = "{{cookiecutter.repository_github_url}}/blob/master/CHANGELOG.md"
 
 [build-system]
-requires = ["hatchling", "hatch-vcs"]
+requires = ["hatchling==1.29.0", "hatch-vcs==0.5.0"]
 build-backend = "hatchling.build"
 
 [tool.hatch.version]
 source = "vcs"
 fallback-version = "0.0.0"
 
-
 [tool.hatch.build.hooks.vcs]
 version-file = "src/{{cookiecutter.package_name}}/_version.py"
 
 [dependency-groups]
 test = [
-    "freezegun",
-    "pytest",
-    "pytest-apiver",
-    "pytest-asyncio",
-# COOKIECUTTER{%- if cookiecutter.is_django_package == "y" %}
-    "pytest-django",
-# COOKIECUTTER{%- endif %}
-    "pytest-xdist",
+    "freezegun==1.5.5",
+    "pytest==9.0.2",
+    "pytest-apiver==0.1.0",
+    "pytest-asyncio==1.3.0",
+    {% if cookiecutter.django_versions %}
+    "pytest-django==4.12.0",
+    {% endif %}
+    "pytest-xdist==3.8.0",
 ]
 lint = [
-    "codespell[toml]",
-# COOKIECUTTER{%- if cookiecutter.is_django_package == "y" %}
-    "django-stubs>=1.12.0",
-# COOKIECUTTER{%- endif %}
-    "mypy>=1.8",
-    "ruff",
-    "types-freezegun",
-    "types-python-dateutil",
-    "types-requests",
+    "codespell[toml]==2.4.2",
+    {% if cookiecutter.django_versions %}
+    "django-stubs==5.2.9",
+    {% endif %}
+    "mypy==1.20.0",
+    "ruff==0.15.8",
+    "types-freezegun==1.1.10",
+    "types-python-dateutil==2.9.0.20260323",
+    "types-requests==2.33.0.20260327",
 ]
-release = [
-    "towncrier",
-]
+
+[tool.commitizen]
+version_provider = "scm"
+annotated_tag = true
+tag_format = "v$version"
+changelog_file = "CHANGELOG.md"
+update_changelog_on_bump = true
 
 [tool.pytest.ini_options]
 pythonpath = ["."]  # allow for `import tests` in test files
 target_package_name = "{{cookiecutter.package_name}}"  # required by pytest-apiver
 
-# COOKIECUTTER{%- if cookiecutter.is_django_package == "y" %}
+{% if cookiecutter.django_versions %}
 DJANGO_SETTINGS_MODULE="tests.settings"
-# COOKIECUTTER{%- endif %}
+{% endif %}
 
 [tool.ruff]
 line-length = 120
@@ -82,7 +89,7 @@ line-length = 120
 select = [
     "D",
     "E", "F", "I", "UP",
-    "TCH005",
+    "TC005",
 ]
 ignore = [
     "D100", "D105", "D107", "D200", "D202", "D203", "D205", "D212", "D400", "D401", "D415",
@@ -97,50 +104,6 @@ ignore = [
 skip = "*.min.js,uv.lock"
 ignore-words-list = "datas"
 
-
-[tool.towncrier]
-directory = "changelog.d"
-filename = "CHANGELOG.md"
-start_string = "<!-- towncrier release notes start -->\n"
-underlines = ["", "", ""]
-title_format = "## [{version}]({{cookiecutter.repository_github_url}}/releases/tag/v{version}) - {project_date}"
-issue_format = "[#{issue}]({{cookiecutter.repository_github_url}}/issues/{issue})"
-
-[[tool.towncrier.type]]
-directory = "removed"
-name = "Removed"
-showcontent = true
-
-[[tool.towncrier.type]]
-directory = "changed"
-name = "Changed"
-showcontent = true
-
-[[tool.towncrier.type]]
-directory = "fixed"
-name = "Fixed"
-showcontent = true
-
-[[tool.towncrier.type]]
-directory = "deprecated"
-name = "Deprecated"
-showcontent = true
-
-[[tool.towncrier.type]]
-directory = "added"
-name = "Added"
-showcontent = true
-
-[[tool.towncrier.type]]
-directory = "doc"
-name = "Doc"
-showcontent = true
-
-[[tool.towncrier.type]]
-directory = "infrastructure"
-name = "Infrastructure"
-showcontent = true
-
 [tool.mypy]
 
 [[tool.mypy.overrides]]
@@ -150,3 +113,6 @@ module = [
     "tests.*",
 ]
 ignore_missing_imports = true
+
+[tool.uv]
+exclude-newer = "14 days"

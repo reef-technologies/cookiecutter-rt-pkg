@@ -1,3 +1,15 @@
-# COOKIECUTTER{%- if cookiecutter.is_django_package == "y" -%}
-from .django_fixtures import *  # noqa: F401, F403
-# COOKIECUTTER{%- endif %}
+import pytest
+{% if cookiecutter.django_versions %}
+from django.contrib.auth import get_user_model
+from django.test import RequestFactory
+
+
+@pytest.fixture
+def request_factory() -> RequestFactory:
+    return RequestFactory()
+
+
+@pytest.fixture
+def user_model():
+    return get_user_model()
+{% endif %}

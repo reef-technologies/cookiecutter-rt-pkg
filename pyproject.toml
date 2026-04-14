@@ -6,13 +6,12 @@ license = {file = "LICENSE"}
 authors = [
     {name = "Reef Technologies", email = "opensource@reef.pl"},
 ]
-requires-python = ">=3.11"
+requires-python = "==3.14.*"
 
 dependencies = [
-    "codespell",
-    "cruft",
-    "nox",
-    "ruff",
+    "cruft==2.16.0",
+    "ruff==0.15.8",
+    "codespell==2.4.2",
 ]
 
 [tool.ruff]
@@ -25,7 +24,7 @@ exclude = [
 select = [
     "D",
     "E", "F", "I", "UP",
-    "TCH005",
+    "TC005",
 ]
 ignore = [
     "E501",  # checked&fixed by ruff format
@@ -92,3 +91,6 @@ module = [
     "pytest",
 ]
 ignore_missing_imports = true
+
+[tool.uv]
+exclude-newer = "14 days"
