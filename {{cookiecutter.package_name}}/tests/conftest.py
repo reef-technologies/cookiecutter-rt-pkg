@@ -1,5 +1,5 @@
-import pytest
 {% if cookiecutter.django_versions %}
+import pytest
 from django.contrib.auth import get_user_model
 from django.test import RequestFactory
 
