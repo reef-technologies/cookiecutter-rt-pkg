@@ -2,10 +2,10 @@
   "package_name": "package_name",
   "repository_github_url": "https://github.com/reef-technologies/{{ cookiecutter.package_name | replace('_', '-') }}",
   "python_versions": "3.11, 3.12, 3.13, 3.14",
-  "django_versions": "4.2, 5.2",
+  "django_versions": "",
   "build_docker_image": false,
   "__prompts__": {
-    "django_versions": "Make empty if not a Django package"
+    "django_versions": "Comma-separated list, like '4.2, 5.2'; leave empty if not a Django package"
   },
   "_jinja2_env_vars": {
     "trim_blocks": true,

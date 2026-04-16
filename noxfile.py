@@ -22,7 +22,7 @@ PYTHON_VERSION = "3.14"
 
 # tested default config overrides
 CRUFT_TESTED_CONFIG_MATRIX = {
-    "default": {},
+    "default": {"django_versions": ""},
     "django": {"django_versions": "4.2, 5.2"},
 }
 CRUFT_TESTED_CONFIGS = os.getenv("CRUFT_TESTED_CONFIGS", ",".join(CRUFT_TESTED_CONFIG_MATRIX)).split(",")
