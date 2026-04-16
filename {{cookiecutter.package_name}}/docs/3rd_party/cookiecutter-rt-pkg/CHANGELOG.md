@@ -10,7 +10,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 Currently, `cookiecutter-rt-pkg` has no explicit versioning amd we purely rely on `cruft` diff.
 
-## [Unreleased]
+## v0.1.0 (2026-04-17)
 
-* **BREAKING** Introduced cookiecutter-rt-pkg template
-* **BREAKING** Switched cookiecutter vars from `y`/`n` to `true`/`false` (caution: values that were `n` will be treated as `true` after update)
+### Feat
+
+- remove unused directive
+- replace PDM to UV
+
+### Fix
+
+- make readable happy
+- make `django_versions` cookiecutter var empty by default
+- exclude redundant import in `conftest.py`
+- add release type check to `publish-docker` job and stop if type is `prerelease` or `unknown`
+- include `prerelease` label on release notes; refactor release type names
+- fail-fast on invalid release tag
+- upgrade gh-action-sigstore-python to resolve deployment to PYPI issues
+- resolve nox error with uv support
+- dockerfile changes
+- tool.setuptools_scm for docker build
+
+### Refactor
+
+- skip unmatching steps instead of marking job as failed
+- replace outer version management from towncrier to commitizen
