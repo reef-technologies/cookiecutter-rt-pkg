@@ -18,6 +18,18 @@ jobs:
       contents: write  # allows uploading a GitHub release
     runs-on: ubuntu-latest
     steps:
+      - name: Detect release type
+        id: release-type
+        run: |
+          if [[ "${GITHUB_REF_NAME}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(a|b|rc)[0-9]+$ ]]; then
+            echo "type=pre-release" >> "$GITHUB_OUTPUT"
+          elif [[ "${GITHUB_REF_NAME}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "type=stable" >> "$GITHUB_OUTPUT"
+          else
+            echo "Invalid tag format"
+            exit 1
+          fi
+
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
         with:
           fetch-depth: 1
@@ -38,18 +50,6 @@ jobs:
           files: >-
             dist/*.tar.gz
             dist/*.whl
-
-      - name: Detect release type
-        id: release-type
-        run: |
-          if [[ "${GITHUB_REF_NAME}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(a|b|rc)[0-9]+$ ]]; then
-            echo "type=pre-release" >> $GITHUB_OUTPUT
-          elif [[ "${GITHUB_REF_NAME}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "type=stable" >> $GITHUB_OUTPUT
-          else
-            echo "Invalid tag format"
-            exit 1
-          fi
 
       - name: Publish distribution 📦 to TestPyPI
         if: steps.release-type.outputs.type == 'pre-release'
