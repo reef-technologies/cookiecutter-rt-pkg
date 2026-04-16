@@ -6,64 +6,40 @@ on:
   pull_request:
     branches: [master, main]
 
-env:
-  PYTHON_DEFAULT_VERSION: "3.12"
-
 jobs:
-  linter:
+  lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
         with:
-          fetch-depth: 0
-# COOKIECUTTER{%- raw %}
-      - name: Set up Python ${{ env.PYTHON_DEFAULT_VERSION }}
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.PYTHON_DEFAULT_VERSION }}
-          cache: "pip"
-          cache-dependency-path: 'uv.lock'
-      - uses: actions/cache@v4
-        with:
-          path: ~/.cache/uv
-          key: ${{ env.PYTHON_DEFAULT_VERSION }}-uv-${{ hashFiles('uv.lock') }}
-          restore-keys: ${{ env.PYTHON_DEFAULT_VERSION }}-uv-
-# COOKIECUTTER{%- endraw %}
-      - name: Install dependencies
-        run: python -m pip install --upgrade nox uv
+          fetch-depth: 1
+      - uses: ./.github/actions/setup-uv-nox
       - name: Run linters
-        run: nox -vs lint
+        run: uvx nox -vs lint
+
   test:
     timeout-minutes: 10
-# COOKIECUTTER{%- raw %}
+    {% raw %}
     runs-on: ${{ matrix.os }}
-# COOKIECUTTER{%- endraw %}
+    {% endraw %}
     strategy:
       fail-fast: false
       matrix:
         os: ["ubuntu-latest"]
-        python-version: ["3.11", "3.12"]
-        # COOKIECUTTER{%- if cookiecutter.is_django_package == "y" %}
-        django-version: ["3.2", "4.2"]
-        # COOKIECUTTER{%- endif %}
-# COOKIECUTTER{%- raw %}
+        python-version:
+        {% for version in cookiecutter.python_versions.split(",") | map("trim") %}
+          - "{{ version }}"
+        {% endfor %}
+        {% if cookiecutter.django_versions %}
+        django-version:
+        {% for version in cookiecutter.django_versions.split(",") | map("trim") %}
+          - "{{ version }}"
+        {% endfor %}
+        {% endif %}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
         with:
-          fetch-depth: 0
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-          cache: 'pip'
-          cache-dependency-path: 'uv.lock'
-      - uses: actions/cache@v4
-        with:
-          path: ~/.cache/uv
-          key: ${{ matrix.python-version }}-uv-${{ hashFiles('uv.lock') }}
-          restore-keys: ${{ matrix.python-version }}-uv-
-      - name: Install dependencies
-        run: python -m pip install --upgrade 'nox==2024.3.2' uv
+          fetch-depth: 1
+      - uses: ./.github/actions/setup-uv-nox
       - name: Run unit tests
-        run: nox -vs test
-# COOKIECUTTER{%- endraw %}
+        run: uvx nox -vs "test-{% raw %}${{ matrix.python-version }}{% endraw %}{% if cookiecutter.django_versions %}(django='{% raw %}${{ matrix.django-version }}{% endraw %}'){% endif %}"

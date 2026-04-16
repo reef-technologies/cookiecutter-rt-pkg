@@ -1,10 +1,15 @@
 {
   "package_name": "package_name",
-  "repository_github_url": "https://github.com/reef-technologies/package-name",
-  "is_django_package": "n",
-  "build_docker_image": "n",
+  "repository_github_url": "https://github.com/reef-technologies/{{ cookiecutter.package_name | replace('_', '-') }}",
+  "python_versions": "3.11, 3.12, 3.13, 3.14",
+  "django_versions": "",
+  "build_docker_image": false,
+  "__prompts__": {
+    "django_versions": "Comma-separated list, like '4.2, 5.2'; leave empty if not a Django package"
+  },
   "_jinja2_env_vars": {
-    "block_start_string": "# COOKIECUTTER{%",
-    "block_end_string": "%}"
-  }
+    "trim_blocks": true,
+    "lstrip_blocks": true
+  },
+  "_extensions": ["local_extensions.sort_versions"]
 }

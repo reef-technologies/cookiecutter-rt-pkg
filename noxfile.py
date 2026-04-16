@@ -18,26 +18,17 @@ import nox
 CI = os.environ.get("CI") is not None
 
 ROOT = Path(".")
-PYTHON_VERSIONS = ["3.11"]
-PYTHON_DEFAULT_VERSION = PYTHON_VERSIONS[-1]
+PYTHON_VERSION = "3.14"
 
 # tested default config overrides
 CRUFT_TESTED_CONFIG_MATRIX = {
-    "default": {},
-    "django": {"is_django_package": "y"},
+    "default": {"django_versions": ""},
+    "django": {"django_versions": "4.2, 5.2"},
 }
 CRUFT_TESTED_CONFIGS = os.getenv("CRUFT_TESTED_CONFIGS", ",".join(CRUFT_TESTED_CONFIG_MATRIX)).split(",")
 
-nox.options.default_venv_backend = "venv"
-nox.options.reuse_existing_virtualenvs = True
-
-
-# In CI, use Python interpreter provided by GitHub Actions
-if CI:
-    nox.options.force_venv_backend = "none"
-
-
-MD_PATHS = ["*.md"]
+nox.options.default_venv_backend = "uv"
+nox.options.reuse_existing_virtualenvs = not CI
 
 
 def get_cruft_config(config_name="default", **kw):
@@ -105,7 +96,7 @@ def run_readable(session, mode="check"):
         "/data",
         "ghcr.io/bobheadxi/readable:v0.5.0@sha256:423c133e7e9ca0ac20b0ab298bd5dbfa3df09b515b34cbfbbe8944310cc8d9c9",
         mode,
-        *MD_PATHS,
+        "*.md",
         external=True,
     )
 
@@ -154,20 +145,20 @@ def run_shellcheck(session, mode="check"):
     session.run(*shellcheck_cmd, external=True)
 
 
-@nox.session(name="format", python=PYTHON_DEFAULT_VERSION)
+@nox.session(name="format", python=PYTHON_VERSION)
 def format_(session):
     """Lint the code and apply fixes in-place whenever possible."""
-    session.run("pip", "install", "-e", ".[format]")
+    session.install(".")
     session.run("ruff", "check", "--fix", ".")
     run_shellcheck(session, mode="fmt")
     run_readable(session, mode="fmt")
     session.run("ruff", "format", ".")
 
 
-@nox.session(python=PYTHON_DEFAULT_VERSION)
+@nox.session(python=PYTHON_VERSION)
 def lint(session):
     """Run linters in readonly mode."""
-    session.run("pip", "install", "-e", ".[lint]")
+    session.install(".")
     session.run("ruff", "check", "--diff", "--unsafe-fixes", ".")
     session.run("codespell", ".")
     run_shellcheck(session, mode="check")
@@ -177,7 +168,7 @@ def lint(session):
 
 @contextlib.contextmanager
 def crufted_project(session, cruft_config):
-    session.run("pip", "install", "-e", ".")
+    session.install(".")
 
     tmpdir = crufted_project.tmpdir
     if not tmpdir:
@@ -219,7 +210,7 @@ def rm_root_owned(session, dirpath):
         "--rm",
         "-v",
         f"{dirpath}:/tmpdir/",
-        "alpine:3.18.0",
+        "alpine:3.23.3@sha256:25109184c71bdad752c8312a8623239686a9a2071e8825f20acb8f2198c3f659",
         "rm",
         "-rf",
         *[f"/tmpdir/{f.name}" for f in children],
@@ -236,23 +227,23 @@ def docker_up(session):
         session.run("docker", "compose", "down", "-v", "--remove-orphans")
 
 
-@nox.session(python=PYTHON_DEFAULT_VERSION, tags=["crufted_project"])
+@nox.session(python=PYTHON_VERSION, tags=["crufted_project"])
 @nox.parametrize("cruft_config_name", CRUFT_TESTED_CONFIGS)
 def lint_crufted_project(session, cruft_config_name):
     cruft_config = get_cruft_config(cruft_config_name)
     with crufted_project(session, cruft_config):
-        session.run("nox", "-t", "lint")
+        session.run("nox", "-s", "lint")
 
 
-@nox.session(python=PYTHON_DEFAULT_VERSION, tags=["crufted_project"])
+@nox.session(python=PYTHON_VERSION, tags=["crufted_project"])
 @nox.parametrize("cruft_config_name", CRUFT_TESTED_CONFIGS)
 def test_crufted_project(session, cruft_config_name):
     cruft_config = get_cruft_config(cruft_config_name)
     with crufted_project(session, cruft_config):
-        session.run("nox", "-t", "test")
+        session.run("nox", "-s", "test")
 
 
-@nox.session(python=PYTHON_DEFAULT_VERSION)
+@nox.session(python=PYTHON_VERSION)
 def cleanup_crufted_project(session):
     if crufted_project.tmpdir:
         # workaround for docker compose creating root-owned files
