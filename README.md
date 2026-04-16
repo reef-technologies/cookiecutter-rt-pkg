@@ -64,9 +64,11 @@ cruft link https://github.com/reef-technologies/cookiecutter-rt-pkg
 
 # Contributing
 
-When proposing new features or changes, make sure to consider the context of the application template [cookiecutter-rt-django](https://github.com/reef-technologies/cookiecutter-rt-django) as well. It is important we do not try to solve the same problem in two different ways.
+When proposing new features or changes, make sure to consider the context of the application template [cookiecutter-rt-django](https://github.com/reef-technologies/cookiecutter-rt-django) as well.
+It is important we do not try to solve the same problem in two different ways.
 
-Please follow [Conventional Commits](https://www.conventionalcommits.org/) when creating commits. [Commitizen](https://commitizen-tools.github.io/commitizen/) may be used to generate commit messages:
+Please follow [Conventional Commits](https://www.conventionalcommits.org/) when creating commits.
+[Commitizen](https://commitizen-tools.github.io/commitizen/) may be used to generate commit messages:
 
 ```sh
 uv tool install "commitizen==4.13.9"
@@ -75,6 +77,7 @@ cz commit
 ```
 
 To make a stable release, run:
+
 ```sh
 cz bump  # update changelog, make bump commit and tag it
 git push origin HEAD --follow-tags
