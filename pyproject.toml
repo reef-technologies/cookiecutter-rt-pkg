@@ -1,7 +1,6 @@
 [project]
 name = "cookiecutter-rt-pkg"
-description = "RT pkg template - don't install try to install this as package, use it as cruft template"
-version = "0"
+description = "RT pkg template - don't try to install this as package, use it as cruft template"
 license = {file = "LICENSE"}
 authors = [
     {name = "Reef Technologies", email = "opensource@reef.pl"},
@@ -12,6 +11,10 @@ dependencies = [
     "cruft==2.16.0",
     "ruff==0.15.8",
     "codespell==2.4.2",
+]
+
+dynamic = [
+    "version",
 ]
 
 [tool.ruff]
@@ -40,48 +43,14 @@ ignore = [
 skip = "*.min.js,uv.lock"
 ignore-words-list = "datas"
 
-[tool.towncrier]
-directory = "changelog.d"
-filename = "\\{\\{cookiecutter.repostory_name\\}\\}/docs/3rd_party/cookiecutter-rt-pkg/CHANGELOG.md"
-start_string = "<!-- towncrier release notes start -->\n"
-underlines = ["", "", ""]
-title_format = "## [{version}](https://github.com/reef-technologies/cookiecutter-rt-pkg/releases/tag/v{version}) - {project_date}"
-issue_format = "[#{issue}](https://github.com/reef-technologies/cookiecutter-rt-pkg/issues/{issue})"
-
-[[tool.towncrier.type]]
-directory = "removed"
-name = "Removed"
-showcontent = true
-
-[[tool.towncrier.type]]
-directory = "changed"
-name = "Changed"
-showcontent = true
-
-[[tool.towncrier.type]]
-directory = "fixed"
-name = "Fixed"
-showcontent = true
-
-[[tool.towncrier.type]]
-directory = "deprecated"
-name = "Deprecated"
-showcontent = true
-
-[[tool.towncrier.type]]
-directory = "added"
-name = "Added"
-showcontent = true
-
-[[tool.towncrier.type]]
-directory = "doc"
-name = "Doc"
-showcontent = true
-
-[[tool.towncrier.type]]
-directory = "infrastructure"
-name = "Infrastructure"
-showcontent = true
+[tool.commitizen]
+version_provider = "scm"
+annotated_tag = true
+tag_format = "v$version"
+changelog_file = "{{cookiecutter.package_name}}/docs/3rd_party/cookiecutter-rt-pkg/CHANGELOG.md"
+changelog_incremental = true
+changelog_merge_prerelease = true
+update_changelog_on_bump = true
 
 [tool.mypy]
 

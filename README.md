@@ -13,7 +13,7 @@ Packages created from this template get following features:
 - Testing against multiple Python versions, operating systems, and optionally, Django versions
 - Testing utils for testing ApiVer interfaces
 - Package layout and release process with SemVer & ApiVer in mind
-- Towncrier for conflict free changelogs
+- Commitizen for version management and changelog generation
 
 ## Template features
 
@@ -64,8 +64,21 @@ cruft link https://github.com/reef-technologies/cookiecutter-rt-pkg
 
 # Contributing
 
-When proposing new features or changes, make sure to consider the context of the application template [cookiecutter-rt-django](https://github.com/reef-technologies/cookiecutter-rt-django) as well.
-It is important we do not try to solve the same problem in two different ways.
+When proposing new features or changes, make sure to consider the context of the application template [cookiecutter-rt-django](https://github.com/reef-technologies/cookiecutter-rt-django) as well. It is important we do not try to solve the same problem in two different ways.
+
+Please follow [Conventional Commits](https://www.conventionalcommits.org/) when creating commits. [Commitizen](https://commitizen-tools.github.io/commitizen/) may be used to generate commit messages:
+
+```sh
+uv tool install "commitizen==4.13.9"
+git add ...
+cz commit
+```
+
+To make a stable release, run:
+```sh
+cz bump  # update changelog, make bump commit and tag it
+git push origin HEAD --follow-tags
+```
 
 ## License
 
