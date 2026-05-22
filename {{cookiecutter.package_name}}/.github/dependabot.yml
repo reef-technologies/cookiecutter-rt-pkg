@@ -5,7 +5,7 @@ updates:
     schedule:
       interval: "daily"
     open-pull-requests-limit: 0  # Only security updates will be opened as PRs
-  - package-ecosystem: "pip"
+  - package-ecosystem: "uv"
     directory: "/"  # specify the directory to scan for dependency files, e.g., "/"
     schedule:
       interval: "daily"
