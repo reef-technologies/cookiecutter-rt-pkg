@@ -10,6 +10,12 @@ on:
     tags:
       - 'v*.*.*'
 
+# Default for jobs that declare no `permissions` of their own. A job-level block
+# REPLACES this one rather than extending it, so each job below must list every
+# scope it needs, including `contents: read` for the checkout.
+permissions:
+  contents: read
+
 jobs:
   {% raw %}
   publish-pypi:
@@ -61,8 +67,6 @@ jobs:
   {% if cookiecutter.build_docker_image %}
   {% raw %}
   publish-docker:
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     permissions:
       packages: write  # allows publishing to GitHub Container Registry
       contents: read   # required for the Docker build context
