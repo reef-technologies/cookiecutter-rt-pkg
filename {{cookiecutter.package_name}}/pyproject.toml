@@ -116,3 +116,5 @@ ignore_missing_imports = true
 
 [tool.uv]
 exclude-newer = "14 days"
+exclude-newer-package = { certifi = false }  # emSign CA removal, see certifi 2026.10.19
+constraint-dependencies = ["certifi>=2026.10.19"]
