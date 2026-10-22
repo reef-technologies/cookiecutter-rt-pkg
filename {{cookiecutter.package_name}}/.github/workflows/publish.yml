@@ -55,13 +55,13 @@ jobs:
 
       - name: Publish distribution 📦 to TestPyPI
         if: steps.release-type.outputs.type == 'prerelease'
-        uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b  # v1.14.0
+        uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086  # v1.14.3
         with:
           repository-url: https://test.pypi.org/legacy/
 
       - name: Publish distribution 📦 to PyPI
         if: steps.release-type.outputs.type == 'release'
-        uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b  # v1.14.0
+        uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086  # v1.14.3
   {% endraw %}
 
   {% if cookiecutter.build_docker_image %}
