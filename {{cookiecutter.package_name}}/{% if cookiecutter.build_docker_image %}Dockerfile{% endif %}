@@ -11,8 +11,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     && rm -rf /var/lib/apt/lists/*
 
-# 0.13.4-python3.14-trixie
-COPY --from=ghcr.io/astral-sh/uv@sha256:81ff59d597a2483d6dfa5a65bf4e021f6e9df8aa68dd6fa3ab5052d2d76fc97b /usr/local/bin/uv /usr/local/bin/uvx /bin/
+# 0.13.5-python3.14-trixie
+COPY --from=ghcr.io/astral-sh/uv@sha256:00c6beb41f4ceb136a7e28a48f9d7ded75f85f4e99bce30a6c89dffbd5d10d7c /usr/local/bin/uv /usr/local/bin/uvx /bin/
 COPY . .
 
 RUN mkdir -p /build && uv export --all-extras --no-emit-project --format requirements.txt > /build/requirements.txt
