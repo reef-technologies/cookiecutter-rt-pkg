@@ -83,6 +83,12 @@ def list_files(suffix: str | None = None) -> list[Path]:
     return file_paths
 
 
+def install_locked(session):
+    """Install the template's locked dependencies into the session's virtualenv."""
+    uv_env = getattr(session.virtualenv, "location", os.getenv("VIRTUAL_ENV"))
+    session.run_install("uv", "sync", "--locked", env={"UV_PROJECT_ENVIRONMENT": uv_env}, external=True)
+
+
 def run_readable(session, mode="check"):
     session.run(
         "docker",
@@ -148,7 +154,7 @@ def run_shellcheck(session, mode="check"):
 @nox.session(name="format", python=PYTHON_VERSION)
 def format_(session):
     """Lint the code and apply fixes in-place whenever possible."""
-    session.install(".")
+    install_locked(session)
     session.run("ruff", "check", "--fix", ".")
     run_shellcheck(session, mode="fmt")
     run_readable(session, mode="fmt")
@@ -158,7 +164,7 @@ def format_(session):
 @nox.session(python=PYTHON_VERSION)
 def lint(session):
     """Run linters in readonly mode."""
-    session.install(".")
+    install_locked(session)
     session.run("ruff", "check", "--diff", "--unsafe-fixes", ".")
     session.run("codespell", ".")
     run_shellcheck(session, mode="check")
@@ -168,7 +174,7 @@ def lint(session):
 
 @contextlib.contextmanager
 def crufted_project(session, cruft_config):
-    session.install(".")
+    install_locked(session)
 
     tmpdir = crufted_project.tmpdir
     if not tmpdir:
